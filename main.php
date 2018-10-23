@@ -1,28 +1,18 @@
 <?php
+require_once "class.php";
 mb_internal_encoding("UTF-8");
-class PathBuilder
-{
-	var $library;
-	function path($from,$to){}
-	function PathBuilder($path){
-		$library=Array();
-			try {
-				$libraryContents=trim(file_get_contents($path),PHP_EOL);
-				$this->library=explode(PHP_EOL, $libraryContents);
-			} catch (Exception $e) {
-				throw e;
-			}
 
-		if(count($this->library)==0)
-		{
-			throw new Exception("Library is empty");
-		}
-	}
-	function Count()
+function renderPath($p)
+{
+	$line="";
+	foreach ($p as $i)
 	{
-		return count($this->library);
+		$line.=$i.'=>';
 	}
+	echo trim($line,"=>")."\n";
 }
+
+//renderPath(Array("AAAA","BBBB"));
 
 if(in_array("--library", $argv))
 {
@@ -40,9 +30,14 @@ if(in_array("--library", $argv))
 	{
 		try{
 			$from=$argv[array_search("--path", $argv)+1];
+				if(strlen($from)!=4)
+					throw new Exception("argument from: invalid lenght");
 			$to=$argv[array_search("--path", $argv)+2];
+				if(strlen($to)!=4)
+                                        throw new Exception("argument to: invalid lenght");
 			echo "Arguments: from: $from, to: $to\n";
 			$path=$pb->path($from,$to);
+			renderPath($path);
 		}
 		catch(Exception $e)
 		{throw $e;}
