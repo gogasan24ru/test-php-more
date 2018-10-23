@@ -24,7 +24,7 @@ class PathBuilder
         var $library;
         function path($from,$to,$ret=Array(),$counter=0){
 		$counter++;
-		if($counter>100){$ret[]="EXITING"; print_r($ret); return $ret;}
+		if($counter>5000){$ret[]="EXITING"; print_r($ret); return $ret;}
 		//$ret=$path;
 		//if (count($ret)==0)
 	        if(end($ret)!=$from)$ret[]=$from;
