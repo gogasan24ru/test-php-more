@@ -22,7 +22,9 @@ class PathBuilder
 
 
         var $library;
-        function path($from,$to,$ret=Array()){
+        function path($from,$to,$ret=Array(),$counter=0){
+		$counter++;
+		if($counter>100){$ret[]="EXITING"; print_r($ret); return $ret;}
 		//$ret=$path;
 		//if (count($ret)==0)
 	        if(end($ret)!=$from)$ret[]=$from;
@@ -34,11 +36,19 @@ class PathBuilder
 		        $ret[]=$to;
                         return $ret;
 		}
-		//if(count($ways)==1)return Array("No way found");
+		//if(count($ways)==1)
+		//{
+		//	print_r($ways);
+		//	print_r($ret);
+		//	return Array("No way found");
+		//}
 		foreach ($ways as $way)
 		{
-			$ret=$this->path($way,$to,$ret);
-			if(end($ret)==$to)return $ret;
+			if(!in_array($way,$ret))
+			{
+				$ret=$this->path($way,$to,$ret,$counter);
+				if(end($ret)==$to)return $ret;
+			}
 		}
 		return $ret;
 	}
