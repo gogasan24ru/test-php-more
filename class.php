@@ -1,6 +1,26 @@
 <?php
 class PathBuilder
 {
+	//https://secure.php.net/manual/ru/function.levenshtein.php#113702
+	function utf8_to_extended_ascii($str, &$map)
+	{
+		$matches = array();
+		if (!preg_match_all('/[\xC0-\xF7][\x80-\xBF]+/', $str, $matches))
+		        return $str; // plain ascii string
+    		foreach ($matches[0] as $mbc)
+        		if (!isset($map[$mbc]))
+           			$map[$mbc] = chr(128 + count($map));
+	    	return strtr($str, $map);
+	}
+	function levenshtein_utf8($s1, $s2)
+	{
+		$charMap = array();
+		$s1 = $this->utf8_to_extended_ascii($s1, $charMap);
+		$s2 = $this->utf8_to_extended_ascii($s2, $charMap);
+		return levenshtein($s1, $s2);
+	}
+
+
         var $library;
         function path($from,$to,$ret=Array()){
 		//$ret=$path;
@@ -14,20 +34,11 @@ class PathBuilder
 		        $ret[]=$to;
                         return $ret;
 		}
-		if(count($ways)==1)return Array();
+		//if(count($ways)==1)return Array("No way found");
 		foreach ($ways as $way)
 		{
-			if(!in_array($way,$ret))
-			{
-				if($way===$to)
-				{
-				}
-				else
-				{
-					$ret=$this->path($way,$to,$ret);
-					if(end($ret)==$to)return $ret;
-				}
-			}
+			$ret=$this->path($way,$to,$ret);
+			if(end($ret)==$to)return $ret;
 		}
 		return $ret;
 	}
@@ -55,7 +66,7 @@ class PathBuilder
 		$ret=Array();
 		foreach ($this->library as $word)
 		{
-			if(levenshtein($word,$source)==1)
+			if($this->levenshtein_utf8($word,$source)==1)
 				$ret[]=$word;
 		}
 		return $ret;
